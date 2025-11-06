@@ -1,72 +1,244 @@
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class TaskManager {
+    private final Scanner sc = new Scanner(System.in);
+    // 🆕 اضافه شدن لیست پروژه‌ها
+    private final List<Project> projects = new ArrayList<>();
 
-    private Scanner sc = new Scanner(System.in);
+    // ... (سایر توابع مثل clearScreen, printHeader, waitForEnter, getIntInput) ...
 
-    public void showMainMenu() {
+    public void run() {
+        showMainMenu();
+    }
+
+    private void showMainMenu() {
         int choice;
-        do {
+        while (true) {
             clearScreen();
-            printHeader("TASK MANAGER PRO");
+            printHeader("TASK MANAGER PRO - منوی اصلی");
+            System.out.println("1. مدیریت پروژه‌ها");
+            System.out.println("2. مدیریت وظایف");
+            System.out.println("3. داشبورد و آمار");
+            System.out.println("4. جستجو و فیلتر");
+            System.out.println("0. خروج");
 
-            System.out.println(" 1. 📁 مدیریت پروژه‌ها");
-            System.out.println(" 2. ✅ مدیریت کارها");
-            System.out.println(" 3. 📊 مشاهده داشبورد");
-            System.out.println(" 4. 🔍 جستجو و فیلتر");
-            System.out.println(" 0. 🚪 خروج");
-            System.out.println("\nانتخاب شما:");
-
-            // دریافت ورودی کاربر
+            System.out.println("\nلطفا یک گزینه را انتخاب کنید:");
             choice = getIntInput();
 
-            // بررسی انتخاب
             switch (choice) {
                 case 1:
-                    manageProjects();
+                    manageProjectsMenu(); // ➡️ فراخوانی زیرمنو جدید
                     break;
                 case 2:
-                    manageTasks();
+                    System.out.println("بخش مدیریت وظایف در دست ساخت است.");
+                    waitForEnter();
                     break;
                 case 3:
-                    viewDashboard();
+                    System.out.println("بخش داشبورد در دست ساخت است.");
+                    waitForEnter();
                     break;
                 case 4:
-                    searchFilterMenu();
+                    System.out.println("بخش جستجو در دست ساخت است.");
+                    waitForEnter();
                     break;
                 case 0:
-                    System.out.println("👋 خداحافظ!");
-                    break;
+                    System.out.println("از این که از Task Manager Pro استفاده کردید، متشکریم!👋");
+                    sc.close();
+                    return; // خروج از حلقه و تابع
                 default:
-                    System.out.println("❗ گزینه نامعتبر است، دوباره تلاش کنید.");
+                    System.out.println("گزینه‌ی نامعتبر. لطفا دوباره تلاش کنید.");
                     waitForEnter();
             }
-
-        } while (choice != 0);
+        }
     }
 
-    // 🧱 زیرمنوها (فعلاً خالی - بعداً پر می‌شن)
-    private void manageProjects() {
-        System.out.println("\n-- مدیریت پروژه‌ها --");
+    // ==========================================================
+    // 🆕 متد جدید: زیرمنوی مدیریت پروژه‌ها
+    // ==========================================================
+    private void manageProjectsMenu() {
+        int choice;
+        while (true) {
+            clearScreen();
+            printHeader("مدیریت پروژه‌ها");
+            System.out.println("1. ایجاد پروژه جدید");
+            System.out.println("2. مشاهده همه پروژه‌ها");
+            System.out.println("3. ویرایش پروژه");
+            System.out.println("4. حذف پروژه");
+            System.out.println("0. بازگشت به منوی اصلی");
+
+            System.out.println("\nلطفا یک گزینه را انتخاب کنید:");
+            choice = getIntInput();
+
+            switch (choice) {
+                case 1:
+                    createProject();
+                    break;
+                case 2:
+                    viewProjects();
+                    break;
+                case 3:
+                    editProject();
+                    break;
+                case 4:
+                    deleteProject();
+                    break;
+                case 0:
+                    return; // بازگشت به showMainMenu
+                default:
+                    System.out.println("گزینه‌ی نامعتبر. لطفا دوباره تلاش کنید.");
+                    waitForEnter();
+            }
+        }
+    }
+
+    // ==========================================================
+    // 🆕 متد جدید: ایجاد پروژه
+    // ==========================================================
+    private void createProject() {
+        clearScreen();
+        printHeader("ایجاد پروژه جدید");
+
+        System.out.print("نام پروژه: ");
+        String name = sc.nextLine().trim();
+
+        System.out.print("توضیحات پروژه: ");
+        String description = sc.nextLine().trim();
+
+        if (name.isEmpty()) {
+            System.out.println("نام پروژه نمی‌تواند خالی باشد.");
+        } else {
+            Project newProject = new Project(name, description);
+            projects.add(newProject);
+            System.out.println("\n✅ پروژه با موفقیت ایجاد شد:");
+            System.out.println(newProject);
+        }
         waitForEnter();
     }
 
-    private void manageTasks() {
-        System.out.println("\n-- مدیریت کارها --");
+    // ==========================================================
+    // 🆕 متد جدید: مشاهده پروژه‌ها
+    // ==========================================================
+    private void viewProjects() {
+        clearScreen();
+        printHeader("همه پروژه‌ها");
+
+        if (projects.isEmpty()) {
+            System.out.println("شما هیچ پروژه‌ای تعریف نکرده‌اید.");
+        } else {
+            for (Project project : projects) {
+                System.out.println(project);
+            }
+        }
         waitForEnter();
     }
 
-    private void viewDashboard() {
-        System.out.println("\n-- مشاهده داشبورد --");
+    // ==========================================================
+    // 🆕 متد جدید: ویرایش پروژه (منطق جزیی بعدا تکمیل می‌شود)
+    // ==========================================================
+    private void editProject() {
+        clearScreen();
+        printHeader("ویرایش پروژه");
+
+        viewProjects();
+
+        if (projects.isEmpty()) {
+            // viewProjects پیغام خالی بودن را نمایش داده است
+            waitForEnter();
+            return;
+        }
+
+        System.out.println("\nID پروژه‌ای که می‌خواهید ویرایش کنید را وارد کنید:");
+        int idToEdit = getIntInput();
+
+        // پیدا کردن پروژه
+        Project projectToEdit = findProjectById(idToEdit);
+
+        if (projectToEdit == null) {
+            System.out.println("❗ پروژه‌ای با این ID پیدا نشد.");
+        } else {
+            System.out.println("\nدر حال ویرایش: " + projectToEdit.getName());
+
+            System.out.print("نام جدید (Enter برای تغییر نکردن): ");
+            String newName = sc.nextLine().trim();
+            if (!newName.isEmpty()) {
+                projectToEdit.setName(newName);
+            }
+
+            System.out.print("توضیحات جدید (Enter برای تغییر نکردن): ");
+            String newDescription = sc.nextLine().trim();
+            if (!newDescription.isEmpty()) {
+                projectToEdit.setDescription(newDescription);
+            }
+
+            System.out.println("\n✅ پروژه با موفقیت به‌روزرسانی شد.");
+            System.out.println(projectToEdit);
+        }
+
         waitForEnter();
     }
 
-    private void searchFilterMenu() {
-        System.out.println("\n-- جستجو و فیلتر --");
+    // ==========================================================
+    // 🆕 متد جدید: حذف پروژه
+    // ==========================================================
+    private void deleteProject() {
+        clearScreen();
+        printHeader("حذف پروژه");
+
+        viewProjects();
+
+        if (projects.isEmpty()) {
+            waitForEnter();
+            return;
+        }
+
+        System.out.println("\nID پروژه‌ای که می‌خواهید حذف کنید را وارد کنید:");
+        int idToDelete = getIntInput();
+
+        Project projectToDelete = findProjectById(idToDelete);
+
+        if (projectToDelete == null) {
+            System.out.println("❗ پروژه‌ای با این ID پیدا نشد.");
+        } else {
+            projects.remove(projectToDelete);
+            System.out.println("\n✅ پروژه '" + projectToDelete.getName() + "' با موفقیت حذف شد.");
+        }
+
         waitForEnter();
     }
 
-    // 🎨 چاپ سربرگ منو با رنگ و قاب زیبا
+    // ==========================================================
+    // 🆕 متد کمکی: پیدا کردن پروژه با ID
+    // ==========================================================
+    private Project findProjectById(int id) {
+        for (Project project : projects) {
+            if (project.getId() == id) {
+                return project;
+            }
+        }
+        return null; // اگر پیدا نشد
+    }
+
+    // ==========================================================
+    // توابع کمکی قبلی (برای تکمیل کد):
+    // ==========================================================
+    private void clearScreen() {
+        try {
+            // برای ویندوز و سیستم‌های Unix
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // اگر نشد، حداقل چند خط خالی چاپ شود
+            for (int i = 0; i < 50; ++i) System.out.println();
+        }
+    }
+
     private void printHeader(String title) {
         String blue = "\u001B[34m", reset = "\u001B[0m";
         System.out.println(blue + "╔══════════════════════════════════════════════╗");
@@ -74,34 +246,26 @@ public class TaskManager {
         System.out.println("╚══════════════════════════════════════════════╝" + reset);
     }
 
-    // 🔁 ابزار کمکی برای گرفتن عدد از کاربر
+    private void waitForEnter() {
+        System.out.println("\n(فشار دهید ENTER برای ادامه...)");
+        try {
+            sc.nextLine();
+        } catch (Exception e) {
+            // در صورت بروز خطا در اسکنر
+        }
+    }
+
     private int getIntInput() {
         while (true) {
             try {
                 System.out.print("> ");
-                return Integer.parseInt(sc.nextLine().trim());
+                // از nextLine().trim() استفاده می کنیم تا باگ های احتمالی بعد از nextInt را حذف کنیم
+                String input = sc.nextLine().trim();
+                return Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 System.out.println("ورودی عددی نیست، دوباره وارد کنید.");
             }
         }
-    }
-
-    // 🧹 پاک‌کردن صفحه ترمینال (روی بعضی محیط‌ها محدود)
-    private void clearScreen() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
-
-    // ⏸️ توقف تا فشار دادن Enter
-    private void waitForEnter() {
-        System.out.println("\nبرای ادامه Enter را بزنید...");
-        sc.nextLine();
-    }
-
-    // 🚀 تابع اصلی
-    public static void main(String[] args) {
-        TaskManager app = new TaskManager();
-        app.showMainMenu();
     }
 }
 
